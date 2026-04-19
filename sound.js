@@ -47,14 +47,23 @@ function playPop(){
   if(!popBuffer) return;
 
   const source = audioCtx.createBufferSource();
-  source.buffer = popBuffer;
+source.buffer = popBuffer;
 
-  const gainNode = audioCtx.createGain();
-  gainNode.gain.value = volume / 5;
+// ★音量ノード
+const gainNode = audioCtx.createGain();
+gainNode.gain.value = volume / 5;
 
-  source.connect(gainNode).connect(audioCtx.destination);
+// ★短くする（これ重要）
+const now = audioCtx.currentTime;
+gainNode.gain.setValueAtTime(volume / 5, now);
+gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
 
-  source.start(0);
+// 接続
+source.connect(gainNode).connect(audioCtx.destination);
+
+// 再生
+source.start(0);
+source.stop(now + 0.15); // ★ここ追加
 }
 
 // 音量設定
