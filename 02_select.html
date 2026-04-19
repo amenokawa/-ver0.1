@@ -203,9 +203,12 @@ function goTitle(){
     unlockSound();
     playPop();
 
+    // ★追加（これが重要）
+    localStorage.removeItem("currentGame");
+
     setTimeout(()=>{
         location.href = "index.html";
-    },750); // ←ここ変更
+    },750);
 }
 
 // =========================
