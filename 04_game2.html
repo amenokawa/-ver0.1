@@ -26,6 +26,8 @@ body{
     background:white;
     position:relative;
     overflow:hidden;
+
+     touch-action: none; /* ★これ追加 */
 }
 
 #player{
@@ -181,7 +183,10 @@ function checkHit(){
 
 /* ドラッグ開始 */
 player.addEventListener("pointerdown",(e)=>{
+    
+    e.preventDefault();   // ★これ追加（最重要）
     e.stopPropagation();
+    
     dragging = true;
 });
 
