@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ポンと出来るゲーム ver0.1 - Game4</title>
+
+<style>
+body{
+    margin:0;
+    background:white;
+    font-family:sans-serif;
+    text-align:center;
+    user-select:none;
+}
+
+#gameArea{
+    width:min(90vw, 400px);
+    margin:40px auto;
+}
+
+#gameFrame{
+    width:min(90vw, 400px);
+    height:min(90vw, 400px);
+    border:6px solid black;
+    background:white;
+    position:relative;
+    overflow:hidden;
+}
+
+#target{
+    width:80px;
+    height:80px;
+    background:red;
+    border-radius:50%;
+    position:absolute;
+    transition: transform 0.3s linear;
+
+    visibility:hidden;
+}
+
+#bottomUI{
+    width:360px;
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+    font-size:20px;
+}
+
+#back{ cursor:pointer; }
+#score{ pointer-events:none; }
+
+*:focus{ outline:none; }
+</style>
+</head>
+
+<body>
+
+<div id="gameArea">
+
+    <div id="gameFrame">
+        <div id="target"></div>
+    </div>
+
+    <div id="bottomUI">
+        <div id="back">もどる</div>
+        <div id="score">スコア：0</div>
+    </div>
+
+</div>
+
+<script src="sound.js"></script>
+
+<script>
+
+// =========================
+// 🔊 sound.js 初期化
+// =========================
+initSound();
+
+window.addEventListener("pointerdown", () => {
+    unlockSound();
+}, { once:true });
+
+// =========================
+// ゲーム処理
+// =========================
+const frame = document.getElementById("gameFrame");
+const target = document.getElementById("target");
+const scoreText = document.getElementById("score");
+
+let score = 0;
+
+let dragging = false;
+let lastX = 0;
+let lastY = 0;
+let prevX = 0;
+let prevY = 0;
+
+/* 中央 */
+function placeCenter(){
+    const x = (frame.clientWidth / 2) - 40;
+    const y = (frame.clientHeight / 2) - 40;
+
+    target.style.left = x + "px";
+    target.style.top = y + "px";
+    target.style.transform = "translate(0,0)";
+}
+
+/* ドラッグ開始 */
+target.addEventListener("pointerdown",(e)=>{
+    e.stopPropagation(); // ★重要
+
+    dragging = true;
+
+    // ★初期値リセット
+    lastX = e.clientX;
+    lastY = e.clientY;
+    prevX = e.clientX;
+    prevY = e.clientY;
+});
+
+/* ドラッグ終了 */
+document.addEventListener("pointerup",(e)=>{
+
+    if(!dragging) return;
+    dragging = false;
+
+    const dx = lastX - prevX;
+    const dy = lastY - prevY;
+
+    const length = Math.sqrt(dx*dx + dy*dy);
+
+    if(length < 5) return;
+
+    const nx = dx / length;
+    const ny = dy / length;
+
+    const distance = 600;
+
+    const moveX = nx * distance;
+    const moveY = ny * distance;
+
+    /* 飛ばす */
+    target.style.transform = `translate(${moveX}px, ${moveY}px)`;
+
+    score++;
+
+    unlockSound();
+    playPop();
+
+    scoreText.textContent = "スコア：" + score;
+
+    /* リセット */
+    setTimeout(()=>{
+
+        target.style.visibility = "hidden";
+
+        target.style.transition = "none";
+        target.style.transform = "translate(0,0)";
+
+        placeCenter();
+
+        requestAnimationFrame(()=>{
+            target.style.visibility = "visible";
+            target.style.transition = "transform 0.3s linear";
+        });
+
+    },300);
+
+});
+
+/* ドラッグ移動 */
+document.addEventListener("pointermove",(e)=>{
+
+    if(!dragging) return;
+
+    const rect = frame.getBoundingClientRect();
+
+    let x = e.clientX - rect.left - 40;
+    let y = e.clientY - rect.top - 40;
+
+    const maxX = frame.clientWidth - 80;
+    const maxY = frame.clientHeight - 80;
+
+    if(x < 0) x = 0;
+    if(y < 0) y = 0;
+    if(x > maxX) x = maxX;
+    if(y > maxY) y = maxY;
+
+    prevX = lastX;
+    prevY = lastY;
+
+    lastX = e.clientX;
+    lastY = e.clientY;
+
+    target.style.left = x + "px";
+    target.style.top = y + "px";
+});
+
+/* 戻る */
+document.getElementById("back").addEventListener("pointerdown", (e) => {
+    e.stopPropagation();
+
+    unlockSound();
+    playPop();
+
+    setTimeout(() => {
+        history.back();
+    }, 750);
+});
+
+/* 初期 */
+placeCenter();
+target.style.visibility = "visible"; // ←追加
+
+</script>
+
+</body>
+</html>

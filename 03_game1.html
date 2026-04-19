@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ポンと出来るゲーム ver0.1 - Game1</title>
+
+<style>
+body{
+    margin:0;
+    background:white;
+    font-family:sans-serif;
+    text-align:center;
+    user-select:none;
+}
+
+#gameArea{
+    width:min(90vw, 400px);
+    margin:40px auto;
+}
+
+#gameFrame{
+    width:min(90vw, 400px);
+    height:min(90vw, 400px);
+    border:6px solid black;
+    background:white;
+    position:relative;
+    overflow:hidden;
+}
+
+#target{
+    width:80px;
+    height:80px;
+    background:red;
+    border-radius:50%;
+    position:absolute;
+
+    visibility:hidden;
+}
+
+#bottomUI{
+    width:360px;
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+    font-size:20px;
+}
+
+#back{
+    cursor:pointer;
+}
+
+#score{
+    pointer-events:none;
+}
+
+*:focus{
+    outline:none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="gameArea">
+
+    <div id="gameFrame">
+        <div id="target"></div>
+    </div>
+
+    <div id="bottomUI">
+        <div id="back">もどる</div>
+        <div id="score">スコア：0</div>
+    </div>
+
+</div>
+
+<script src="sound.js"></script>
+
+<script>
+
+// =========================
+// 🔊 sound.js 初期化
+// =========================
+initSound();
+
+window.addEventListener("pointerdown", () => {
+    unlockSound();
+}, { once:true });
+
+// =========================
+// ゲーム処理
+// =========================
+const frame = document.getElementById("gameFrame");
+const target = document.getElementById("target");
+const scoreText = document.getElementById("score");
+
+let score = 0;
+
+/* 最初中央 */
+function placeCenter(){
+    const x = (frame.clientWidth / 2) - 40;
+    const y = (frame.clientHeight / 2) - 40;
+    target.style.left = x + "px";
+    target.style.top = y + "px";
+}
+
+/* ランダム */
+function moveRandom(){
+    const maxX = frame.clientWidth - 80;
+    const maxY = frame.clientHeight - 80;
+
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
+
+    target.style.left = x + "px";
+    target.style.top = y + "px";
+}
+
+/* タップ */
+target.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // ★これ重要
+
+    unlockSound();
+    playPop();
+
+    score++;
+    scoreText.textContent = "スコア：" + score;
+
+    moveRandom();
+});
+
+/* 戻る */
+document.getElementById("back").addEventListener("pointerdown", (e) => {
+    e.stopPropagation();
+
+    unlockSound();
+    playPop();
+
+    setTimeout(() => {
+        history.back();
+    }, 750);
+});
+
+/* 初期 */
+placeCenter();
+target.style.visibility = "visible"; // ←追加
+
+</script>
+
+</body>
+</html>

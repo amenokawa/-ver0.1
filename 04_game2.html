@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ポンと出来るゲーム ver0.1 - Game2</title>
+
+<style>
+body{
+    margin:0;
+    background:white;
+    font-family:sans-serif;
+    text-align:center;
+    user-select:none;
+}
+
+#gameArea{
+    width:min(90vw, 400px);
+    margin:40px auto;
+}
+
+#gameFrame{
+    width:min(90vw, 400px);
+    height:min(90vw, 400px);
+    border:6px solid black;
+    background:white;
+    position:relative;
+    overflow:hidden;
+}
+
+#player{
+    width:80px;
+    height:80px;
+    background:red;
+    border-radius:50%;
+    position:absolute;
+
+    visibility:hidden;
+}
+
+#enemy{
+    width:80px;
+    height:80px;
+    background:black;
+    border-radius:50%;
+    position:absolute;
+
+    visibility:hidden;
+}
+
+#bottomUI{
+    width:360px;
+    display:flex;
+    justify-content:space-between;
+    margin-top:10px;
+    font-size:20px;
+}
+
+#back{
+    cursor:pointer;
+}
+
+#score{
+    pointer-events:none;
+}
+
+*:focus{
+    outline:none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="gameArea">
+
+    <div id="gameFrame">
+        <div id="player"></div>
+        <div id="enemy"></div>
+    </div>
+
+    <div id="bottomUI">
+        <div id="back">もどる</div>
+        <div id="score">スコア：0</div>
+    </div>
+
+</div>
+
+<!-- ★共通音 -->
+<script src="sound.js"></script>
+
+<script>
+
+// =========================
+// 🔊 sound.js 初期化
+// =========================
+initSound();
+
+window.addEventListener("pointerdown", () => {
+    unlockSound();
+}, { once:true });
+
+// =========================
+// ゲーム処理
+// =========================
+const frame = document.getElementById("gameFrame");
+const player = document.getElementById("player");
+const enemy = document.getElementById("enemy");
+const scoreText = document.getElementById("score");
+
+let score = 0;
+let dragging = false;
+
+/* 赤丸中央 */
+function placeCenter(){
+    const x = (frame.clientWidth / 2) - 40;
+    const y = (frame.clientHeight / 2) - 40;
+    player.style.left = x + "px";
+    player.style.top = y + "px";
+}
+
+/* 黒丸ランダム */
+function moveEnemy(){
+
+    const maxX = frame.clientWidth - 80;
+    const maxY = frame.clientHeight - 80;
+
+    let x, y;
+    let safe = false;
+
+    while(!safe){
+
+        x = Math.random() * maxX;
+        y = Math.random() * maxY;
+
+        const px = player.offsetLeft + 40;
+        const py = player.offsetTop + 40;
+
+        const ex = x + 40;
+        const ey = y + 40;
+
+        const dx = px - ex;
+        const dy = py - ey;
+
+        const distance = Math.sqrt(dx*dx + dy*dy);
+
+        if(distance > 120){
+            safe = true;
+        }
+    }
+
+    enemy.style.left = x + "px";
+    enemy.style.top = y + "px";
+}
+
+/* 当たり判定（★ここだけ音） */
+function checkHit(){
+
+    const px = player.offsetLeft + 40;
+    const py = player.offsetTop + 40;
+
+    const ex = enemy.offsetLeft + 40;
+    const ey = enemy.offsetTop + 40;
+
+    const dx = px - ex;
+    const dy = py - ey;
+
+    const distance = Math.sqrt(dx*dx + dy*dy);
+
+    if(distance < 80){
+
+        unlockSound();
+        playPop(); // ★ここだけ鳴る
+
+        score++;
+        scoreText.textContent = "スコア：" + score;
+
+        moveEnemy();
+    }
+}
+
+/* ドラッグ開始 */
+player.addEventListener("pointerdown",(e)=>{
+    e.stopPropagation();
+    dragging = true;
+});
+
+/* ドラッグ終了 */
+document.addEventListener("pointerup",()=>{
+    dragging = false;
+});
+
+/* ドラッグ移動 */
+document.addEventListener("pointermove",(e)=>{
+
+    if(!dragging) return;
+
+    const rect = frame.getBoundingClientRect();
+
+    let x = e.clientX - rect.left - 40;
+    let y = e.clientY - rect.top - 40;
+
+    const maxX = frame.clientWidth - 80;
+    const maxY = frame.clientHeight - 80;
+
+    if(x < 0) x = 0;
+    if(y < 0) y = 0;
+    if(x > maxX) x = maxX;
+    if(y > maxY) y = maxY;
+
+    player.style.left = x + "px";
+    player.style.top = y + "px";
+
+    checkHit();
+});
+
+/* 戻る */
+document.getElementById("back").addEventListener("pointerdown", (e) => {
+    e.stopPropagation();
+
+    unlockSound();
+    playPop();
+
+    setTimeout(() => {
+        history.back();
+    }, 750);
+});
+
+/* 初期 */
+placeCenter();
+moveEnemy();
+
+player.style.visibility = "visible";
+enemy.style.visibility = "visible";
+
+</script>
+
+</body>
+</html>

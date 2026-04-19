@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ポンと出来るゲーム ver0.1</title>
+
+<style>
+body{
+  margin:0;
+  background:#ffffff;
+  font-family:sans-serif;
+  text-align:center;
+  user-select:none;
+}
+
+#gameFrame{
+  width:min(90vw, 400px);
+  height:min(90vw, 400px);
+  border:3px solid black;
+  margin:40px auto 10px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  background:white;
+}
+
+.title{
+  font-size:28px;
+  font-weight:bold;
+}
+
+.redDot{
+  color:red;
+}
+
+.version{
+  font-size:12px;
+  margin-top:6px;
+}
+
+#playBtn{
+  width:min(90vw, 400px);
+  padding:14px;
+  margin:15px auto;
+  background:black;
+  color:white;
+  font-size:20px;
+  border:none;
+  cursor:pointer;
+}
+
+#uiArea{
+  width:min(90vw, 400px);
+  margin:auto;
+  text-align:left;
+}
+
+.menuBtn{
+  display:block;
+  margin:6px 0;
+  font-size:14px;
+  cursor:pointer;
+}
+
+#volumeArea{
+  margin-top:10px;
+}
+
+.overlay{
+  position:absolute;
+  width:min(90vw, 400px);
+  height:min(90vw, 400px);
+  background:rgba(0,0,0,0.6);
+  color:white;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:20px;
+}
+
+/* ★これを一番下に追加 */
+.vol{
+  cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="gameFrame">
+  <div class="title">
+    <span class="redDot">●</span> ポンと出来るゲーム
+  </div>
+  <div class="version">ver0.1</div>
+
+  <div id="overlay" class="overlay"></div>
+</div>
+
+<button id="playBtn">▶ プレイ</button>
+
+<div id="uiArea">
+
+  <div id="volumeArea">
+    音量：
+    <span class="vol" data-vol="0">0</span>
+    <span class="vol" data-vol="1">1</span>
+    <span class="vol" data-vol="2">2</span>
+    <span class="vol" data-vol="3">3</span>
+    <span class="vol" data-vol="4">4</span>
+    <span class="vol" data-vol="5">5</span>
+  </div>
+
+  <span class="menuBtn" id="ruleBtn">利用規約</span>
+  <span class="menuBtn" id="creditBtn">クレジット</span>
+
+</div>
+
+<!-- ★共通音 -->
+<script src="sound.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  // =========================
+  // 🔊 sound.js 初期化
+  // =========================
+  initSound();
+
+window.addEventListener("pointerdown", () => {
+  unlockSound();
+});
+
+// =========================
+// UI処理
+// =========================
+const overlay = document.getElementById("overlay");
+
+/* プレイ */
+document.getElementById("playBtn").addEventListener("pointerdown", () => {
+
+    unlockSound();   // ←追加（これが最重要）
+    playPop();
+
+    setTimeout(() => {
+        location.href = "02_select.html";
+    }, 750);
+
+});
+
+/* 音量（★完全対応） */
+document.querySelectorAll(".vol").forEach(btn=>{
+  btn.addEventListener("pointerdown", () => {
+    const v = Number(btn.dataset.vol);
+
+    unlockSound(); // ←先に
+    setVolume(v);
+    playPop();
+ });
+});
+
+/* 利用規約 */
+document.getElementById("ruleBtn").addEventListener("pointerdown", () => {
+  overlay.style.display = "flex";
+  overlay.innerHTML = `
+  利用規約<br><br>
+  本ゲームはフリー素材を使用しています。<br>
+  配信・使用は自由です。<br><br>
+  タップで閉じる
+  `;
+});
+
+/* クレジット */
+document.getElementById("creditBtn").addEventListener("pointerdown", () => {
+  overlay.style.display = "flex";
+  overlay.innerHTML = `
+  クレジット<br><br>
+  効果音：Google Sound Library<br>
+  開発：あなた<br><br>
+  タップで閉じる
+  `;
+});
+
+/* 閉じる */
+overlay.addEventListener("pointerdown", () => {
+  overlay.style.display = "none";
+});
+
+});
+
+</script>
+
+</body>
+</html>

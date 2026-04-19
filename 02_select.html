@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ポンと出来るゲーム ver0.1 - セレクト</title>
+
+<style>
+body{
+    margin:0;
+    background:#ffffff;
+    font-family:sans-serif;
+    text-align:center;
+    user-select:none;
+    -webkit-user-select:none;
+}
+
+*:focus{
+    outline:none;
+}
+
+#gameFrame{
+    width:min(90vw, 400px);
+    height:min(90vw, 400px);
+    border:3px solid black;
+    margin:40px auto;
+    position:relative;
+    background:white;
+}
+
+#gameDescription{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-size:22px;
+    line-height:1.6;
+}
+
+.red{
+    color:red;
+    font-weight:bold;
+}
+
+#navHint{
+    position:absolute;
+    bottom:20px;
+    width:100%;
+    font-size:16px;
+}
+
+#playButton{
+    width:260px;
+    margin:20px auto;
+    padding:15px;
+    font-size:28px;
+    background:black;
+    color:white;
+    cursor:pointer;
+}
+
+#backTitle{
+    margin-top:10px;
+    font-size:16px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div id="gameFrame">
+    <div id="gameDescription"></div>
+
+    <div id="navHint">
+        ← 左右タップで切替 →
+    </div>
+</div>
+
+<div id="playButton">▶ プレイ</div>
+<div id="backTitle">タイトルへ</div>
+
+<!-- ★共通音 -->
+<script src="sound.js"></script>
+
+<script>
+
+// =========================
+// 🔊 sound.js 初期化
+// =========================
+let soundReady = false;
+
+async function setupSound(){
+    await initSound();
+    soundReady = true;
+    console.log("音準備OK");
+}
+
+setupSound();
+
+window.addEventListener("pointerdown", () => {
+  unlockSound();
+});
+
+// =========================
+// ゲームデータ
+// =========================
+let currentGame = 0;
+
+const games = [
+
+{
+name:"ゲーム①",
+desc:`<span class="red">●</span> をタップしよう`
+},
+
+{
+name:"ゲーム②",
+desc:`中央の <span class="red">●</span> をなぞって<br>
+黒丸を消そう`
+},
+
+{
+name:"ゲーム③",
+desc:`<span class="red">●</span> をひたすら連打`
+},
+
+{
+name:"ゲーム④",
+desc:`中央の <span class="red">●</span><br>
+フリックして飛ばそう`
+}
+
+];
+
+function updateGame(){
+document.getElementById("gameDescription").innerHTML =
+games[currentGame].desc;
+}
+
+// =========================
+// 切替
+// =========================
+function tapSwitch(e){
+
+    unlockSound();
+
+    if(soundReady) playPop();
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const width = rect.width;
+
+    if(x < width/2){
+        currentGame--;
+    }else{
+        currentGame++;
+    }
+
+    if(currentGame < 0) currentGame = games.length -1;
+    if(currentGame >= games.length) currentGame = 0;
+
+    updateGame();
+}
+
+// =========================
+// ボタン処理
+// =========================
+
+/* プレイ */
+function startGame(){
+
+    unlockSound();
+    playPop();
+
+    // ★追加（これが重要）
+    localStorage.setItem("currentGame", currentGame);
+
+    setTimeout(() => {
+
+        if(currentGame === 0){
+            location.href = "03_game1.html";
+        }
+        else if(currentGame === 1){
+            location.href = "04_game2.html";
+        }
+        else if(currentGame === 2){
+            location.href = "05_game3.html";
+        }
+        else if(currentGame === 3){
+            location.href = "06_game4.html";
+        }
+
+    }, 750);
+}
+
+/* タイトルへ */
+function goTitle(){
+
+    unlockSound();
+    playPop();
+
+    setTimeout(()=>{
+        location.href = "index.html";
+    },750); // ←ここ変更
+}
+
+// =========================
+// 初期＆イベント
+// =========================
+const saved = localStorage.getItem("currentGame");
+
+if(saved !== null){
+    currentGame = Number(saved);
+}
+
+updateGame();
+
+document.getElementById("gameFrame").addEventListener("pointerdown", tapSwitch);
+document.getElementById("playButton").addEventListener("pointerdown", startGame);
+document.getElementById("backTitle").addEventListener("pointerdown", goTitle);
+
+</script>
+
+</body>
+</html>
