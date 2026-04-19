@@ -161,6 +161,9 @@ function tapSwitch(e){
     if(currentGame >= games.length) currentGame = 0;
 
     updateGame();
+
+     // ★ここに追加
+    localStorage.setItem("currentGame", currentGame);
 }
 
 // =========================
@@ -208,10 +211,17 @@ function goTitle(){
 // =========================
 // 初期＆イベント
 // =========================
-const saved = localStorage.getItem("currentGame");
+const params = new URLSearchParams(location.search);
+const from = params.get("from");
 
-if(saved !== null){
-    currentGame = Number(saved);
+if(from === "title"){
+    currentGame = 0;
+}else{
+    const saved = localStorage.getItem("currentGame");
+
+    if(saved !== null){
+        currentGame = Number(saved);
+    }
 }
 
 updateGame();
