@@ -145,7 +145,7 @@ const overlay = document.getElementById("overlay");
 document.getElementById("playBtn").addEventListener("pointerdown", () => {
 
     unlockSound();   // ←追加（これが最重要）
-    playPop();
+    playPopShort();
 
     setTimeout(() => {
         location.href = "02_select.html?from=title";
