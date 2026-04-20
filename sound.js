@@ -57,8 +57,8 @@ function playPop(){
 // =========================
 // 短い音（遷移用）
 // =========================
-function playPopShort(){
-  if(!unlocked || !popBuffer) return;
+function playPop(){
+  if(!audioCtx || !unlocked || !popBuffer) return;
 
   const source = audioCtx.createBufferSource();
   source.buffer = popBuffer;
