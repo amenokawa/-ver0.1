@@ -42,7 +42,7 @@ function setVolume(v){
 // 通常音（ゲーム用）
 // =========================
 function playPop(){
-  if(!unlocked || !popBuffer) return;
+  if(!audioCtx || !unlocked || !popBuffer) return;
 
   const source = audioCtx.createBufferSource();
   source.buffer = popBuffer;
@@ -57,7 +57,7 @@ function playPop(){
 // =========================
 // 短い音（遷移用）
 // =========================
-function playPop(){
+function playPopShort(){
   if(!audioCtx || !unlocked || !popBuffer) return;
 
   const source = audioCtx.createBufferSource();
