@@ -13,7 +13,7 @@ let volume = 3;
 async function initSound(){
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-  const res = await fetch("pop.ogg");
+  const res = await fetch("sounds/pop.ogg");
   const arrayBuffer = await res.arrayBuffer();
   popBuffer = await audioCtx.decodeAudioData(arrayBuffer);
 }
