@@ -6,6 +6,7 @@ let audioCtx;
 let popBuffer;
 let unlocked = false;
 let volume = 3;
+let lastPlayTime = 0; // ★これ追加
 
 // =========================
 // 初期化
@@ -43,6 +44,13 @@ function setVolume(v){
 // =========================
 function playPop(){
   if(!audioCtx || !unlocked || !popBuffer) return;
+
+  const now = audioCtx.currentTime;
+
+  // ★連打防止
+  if(now - lastPlayTime < 0.05) return;
+
+  lastPlayTime = now;
 
   const source = audioCtx.createBufferSource();
   source.buffer = popBuffer;
