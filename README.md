@@ -4,7 +4,7 @@
 タップ・なぞり・連打・フリックの4種類のゲームを収録しています。
 
 ## 🎮 プレイはこちら
-https://amenokawa.github.io/-ver0.1/
+[https://amenokawa.github.io/-ver0.1/](https://amenokawa.github.io/-ver0.1/)
 
 ## 📱 対応環境
 スマートフォンブラウザ
